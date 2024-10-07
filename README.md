@@ -112,3 +112,98 @@ void Personaje_destruir(Personaje* this) {
     }
 }
 ```
+## Guerrero.h
+```c
+#ifndef GUERRERO_H
+#define GUERRERO_H
+
+#include "Personaje.h"
+
+typedef struct Guerrero {
+    Personaje base;
+    int fuerza;
+} Guerrero;
+
+Guerrero* Guerrero_crear(const char* nombre, int vida, int nivel, int fuerza);
+void Guerrero_destruir(Guerrero* this);
+
+#endif // GUERRERO_H
+#pragma once
+```
+## Guerrero.C
+```c
+#include "Guerrero.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+static void mostrar_estado_impl(const Personaje* this) {
+    Guerrero* guerrero = (Guerrero*)this;
+    printf("Guerrero: %s | Vida: %d | Nivel: %d | Fuerza: %d\n", this->nombre, this->vida, this->nivel, guerrero->fuerza);
+}
+
+Guerrero* Guerrero_crear(const char* nombre, int vida, int nivel, int fuerza) {
+    Guerrero* nuevo_guerrero = (Guerrero*)malloc(sizeof(Guerrero));
+    if (!nuevo_guerrero) return NULL;
+    strcpy_s(nuevo_guerrero->base.nombre, 30, nombre);
+    nuevo_guerrero->base.vida = vida;
+    nuevo_guerrero->base.nivel = nivel;
+    nuevo_guerrero->fuerza = fuerza;
+    nuevo_guerrero->base.mostrar_estado = mostrar_estado_impl;
+    return nuevo_guerrero;
+}
+
+void Guerrero_destruir(Guerrero* this) {
+    if (this) {
+        free(this);
+    }
+}
+```
+## Mago.c
+```c
+#include "mago.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+static void mostrar_estado_impl(const Personaje* this) {
+    Mago* mago = (Mago*)this;
+    printf("Mago: %s | Vida: %d | Nivel: %d | Mana: %d\n", this->nombre, this->vida, this->nivel, mago->Mana);
+}
+
+Mago* mago_crear(const char* nombre, int vida, int nivel, int mana) {
+    Mago* nuevo_mago = (Mago*)malloc(sizeof(Mago));
+    if (!nuevo_mago) return NULL;
+    strcpy_s(nuevo_mago->base.nombre, 30, nombre);
+    nuevo_mago->base.vida = vida;
+    nuevo_mago->base.nivel = nivel;
+    nuevo_mago->Mana = mana;
+    nuevo_mago->base.mostrar_estado = mostrar_estado_impl;
+    return nuevo_mago;
+}
+
+void mago_destruir(Mago* this) {
+    if (this) {
+        //free(this->base.nombre);
+        free(this);
+    }
+}
+```
+## Mago.h
+```c
+#ifndef MAGO_H
+#define MAGO_H
+
+#include "personaje.h"
+
+
+typedef struct Mago {
+    Personaje base;
+    int Mana;
+} Mago;
+
+Mago* mago_crear(const char* nombre, int vida, int nivel, int fuerza);
+void mago_destruir(Mago* this);
+
+#endif // GUERRERO_H
+```
