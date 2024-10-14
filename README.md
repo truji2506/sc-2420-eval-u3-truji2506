@@ -387,6 +387,7 @@ int main(int argc, char* argv[]) {
 }
 ```
 ## Player.c
+```c
 #include "player.h"
 #include <SDL.h>
 
