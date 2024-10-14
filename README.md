@@ -211,7 +211,8 @@ void mago_destruir(Mago* this);
 
 ## DIAGRAMA DE CLASES DEL JUEGO LABERINTO
 
-![image](https://github.com/user-attachments/assets/27e97b1c-e32f-45ba-8111-5e0a44a0522d)
+![image](https://github.com/user-attachments/assets/515c3b55-7aab-434a-9dbb-1eb0a1f819fc)
+
 
 ## EXPLICACIÓN 
 - Game interactúa directamente con Player y Laberinto. Se encarga de actualizar el estado del jugador y del laberinto en cada ciclo y coordina el renderizado de ambos.
