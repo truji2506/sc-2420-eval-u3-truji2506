@@ -363,3 +363,127 @@ Agregación se utiliza entre Game y Player porque Player es un objeto que Game u
 Composición se usa entre Game y Maze porque el laberinto es una parte integral del juego, y su existencia depende de la instancia de Game. Si destruyes el juego, destruyes el laberinto.
 
 Dependencia se usa entre Player y Maze ya que Player necesita al Maze para verificar el entorno (colisiones), pero no lo contiene ni lo controla.
+
+## Main.c
+```c
+#include "game.h"
+#include <SDL.h>
+#include <stdio.h>
+#include <stdbool.h>
+
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 480
+#define LINE_SIZE 40  
+#define PLAYER_SIZE 30 
+#define PLAYER_OFFSET (LINE_SIZE - PLAYER_SIZE) / 2
+#define PLAYER_SPEED 5  
+#define FPS 60
+#define FRAME_TARGET_TIME (1000 / FPS)
+
+int main(int argc, char* argv[]) {
+    Game game;
+    game.Run();
+    return 0;
+}
+```
+## Player.c
+#include "player.h"
+#include <SDL.h>
+
+// Constructor
+Player::Player(float x, float y) : Entity(x, y), health(100), score(0) {
+    // Inicializamos al jugador con su posición y atributos iniciales
+}
+
+// Método para actualizar el estado del jugador (se sobrescribe de Entity)
+void Player::Update() {
+    // Aquí podrías agregar lógica adicional para actualizar el jugador (colisiones, etc.)
+}
+
+// Método para renderizar al jugador en la pantalla (se sobrescribe de Entity)
+void Player::Render(SDL_Renderer* renderer) {
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);  // Color rojo para el jugador
+    SDL_Rect playerRect = { static_cast<int>(position.x), static_cast<int>(position.y), PLAYER_SIZE, PLAYER_SIZE };
+    SDL_RenderFillRect(renderer, &playerRect);  // Dibujar el rectángulo del jugador
+}
+
+// Maneja la entrada del jugador (teclas presionadas)
+void Player::HandleInput(const Uint8* state) {
+    Vector2D newPosition = position;
+
+    if (state[SDL_SCANCODE_UP]) newPosition.y -= PLAYER_SPEED;
+    if (state[SDL_SCANCODE_DOWN]) newPosition.y += PLAYER_SPEED;
+    if (state[SDL_SCANCODE_LEFT]) newPosition.x -= PLAYER_SPEED;
+    if (state[SDL_SCANCODE_RIGHT]) newPosition.x += PLAYER_SPEED;
+
+    SetPosition(newPosition.x, newPosition.y);
+}
+
+// Getters y setters para health
+int Player::GetHealth() const {
+    return health;
+}
+
+void Player::SetHealth(int health) {
+    this->health = health;
+}
+
+// Getters y setters para score
+int Player::GetScore() const {
+    return score;
+}
+
+void Player::SetScore(int score) {
+    this->score = score;
+}
+
+#include "player.h"
+#include <SDL.h>
+
+// Constructor
+Player::Player(float x, float y) : Entity(x, y), health(100), score(0) {
+    // Inicializamos al jugador con su posición y atributos iniciales
+}
+
+// Método para actualizar el estado del jugador (se sobrescribe de Entity)
+void Player::Update() {
+    // Aquí podrías agregar lógica adicional para actualizar el jugador (colisiones, etc.)
+}
+
+// Método para renderizar al jugador en la pantalla (se sobrescribe de Entity)
+void Player::Render(SDL_Renderer* renderer) {
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);  // Color rojo para el jugador
+    SDL_Rect playerRect = { static_cast<int>(position.x), static_cast<int>(position.y), PLAYER_SIZE, PLAYER_SIZE };
+    SDL_RenderFillRect(renderer, &playerRect);  // Dibujar el rectángulo del jugador
+}
+
+// Maneja la entrada del jugador (teclas presionadas)
+void Player::HandleInput(const Uint8* state) {
+    Vector2D newPosition = position;
+
+    if (state[SDL_SCANCODE_UP]) newPosition.y -= PLAYER_SPEED;
+    if (state[SDL_SCANCODE_DOWN]) newPosition.y += PLAYER_SPEED;
+    if (state[SDL_SCANCODE_LEFT]) newPosition.x -= PLAYER_SPEED;
+    if (state[SDL_SCANCODE_RIGHT]) newPosition.x += PLAYER_SPEED;
+
+    SetPosition(newPosition.x, newPosition.y);
+}
+
+// Getters y setters para health
+int Player::GetHealth() const {
+    return health;
+}
+
+void Player::SetHealth(int health) {
+    this->health = health;
+}
+
+// Getters y setters para score
+int Player::GetScore() const {
+    return score;
+}
+
+void Player::SetScore(int score) {
+    this->score = score;
+}
+```
