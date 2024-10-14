@@ -219,8 +219,11 @@ void mago_destruir(Mago* this);
 - Player y Laberinto tienen métodos para verificar colisiones, pero es Game quien orquesta estas interacciones y asegura que el jugador no traspase las paredes del laberinto.
 
 Herencia no se aplicó porque no hay una jerarquía natural ni una necesidad de compartir código entre clases mediante herencia. Cada clase tiene un propósito específico y aislado, por lo que es mejor usar composición y dependencia para estructurar las interacciones.
+
 Agregación se utiliza entre Game y Player porque Player es un objeto que Game usa pero que puede existir fuera del juego. Esto permite una relación más flexible entre ambos.
+
 Composición se usa entre Game y Maze porque el laberinto es una parte integral del juego, y su existencia depende de la instancia de Game. Si destruyes el juego, destruyes el laberinto.
+
 Dependencia se usa entre Player y Maze ya que Player necesita al Maze para verificar el entorno (colisiones), pero no lo contiene ni lo controla.
 
 
