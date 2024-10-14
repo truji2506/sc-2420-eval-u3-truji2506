@@ -213,3 +213,7 @@ void mago_destruir(Mago* this);
 
 ![image](https://github.com/user-attachments/assets/27e97b1c-e32f-45ba-8111-5e0a44a0522d)
 
+## EXPLICACIÓN 
+- Game interactúa directamente con Player y Laberinto. Se encarga de actualizar el estado del jugador y del laberinto en cada ciclo y coordina el renderizado de ambos.
+- Player y Laberinto tienen métodos para verificar colisiones, pero es Game quien orquesta estas interacciones y asegura que el jugador no traspase las paredes del laberinto.
+
