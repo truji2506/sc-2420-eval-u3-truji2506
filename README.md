@@ -207,3 +207,9 @@ void mago_destruir(Mago* this);
 
 #endif // GUERRERO_H
 ```
+## ACTIVIDAD 2 
+
+## DIAGRAMA DE CLASES DEL JUEGO LABERINTO
+
+![image](https://github.com/user-attachments/assets/27e97b1c-e32f-45ba-8111-5e0a44a0522d)
+
