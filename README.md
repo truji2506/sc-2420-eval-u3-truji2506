@@ -488,3 +488,291 @@ void Player::SetScore(int score) {
     this->score = score;
 }
 ```
+## Entity.c
+```c
+#include "entity.h"
+#include <SDL.h>
+
+// Constructor de Entity
+Entity::Entity(float x, float y) : position(x, y), texture(nullptr) {}
+
+// Método para obtener la posición
+Vector2D Entity::GetPosition() const {
+    return position;
+}
+
+// Método para establecer la posición
+void Entity::SetPosition(float x, float y) {
+    position.Set(x, y);
+}
+```
+## Game.c
+```c
+#include "game.h"
+#include <SDL.h>
+
+Game::Game() : window(nullptr), renderer(nullptr), gameIsRunning(true), lastUpdateTime(0) {
+    player = new Player(1 * LINE_SIZE + PLAYER_OFFSET, 1 * LINE_SIZE + PLAYER_OFFSET);
+}
+
+Game::~Game() {
+    delete player;
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+}
+
+void Game::Setup() {
+    SDL_Init(SDL_INIT_VIDEO);
+    window = SDL_CreateWindow("Juego de Laberinto", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+}
+
+void Game::Update() {
+    int time_to_wait = FRAME_TARGET_TIME - (SDL_GetTicks() - lastUpdateTime);
+    if (time_to_wait > 0 && time_to_wait <= FRAME_TARGET_TIME) {
+        SDL_Delay(time_to_wait);
+    }
+    lastUpdateTime = SDL_GetTicks();
+}
+
+void Game::Render() {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    maze.Draw(renderer);
+    player->Render(renderer);
+
+    SDL_RenderPresent(renderer);
+}
+
+void Game::HandleEvents() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            gameIsRunning = false;
+        }
+    }
+
+    const Uint8* state = SDL_GetKeyboardState(NULL);
+    player->HandleInput(state);
+
+    if (maze.CheckCollision(player)) {
+        // Manejar la colisión
+    }
+}
+
+void Game::Run() {
+    Setup();
+    while (gameIsRunning) {
+        HandleEvents();
+        Update();
+        Render();
+    }
+}
+```
+## Maze.c
+```c
+#include "maze.h"
+#include <SDL.h>
+
+class Maze {
+private:
+    int maze[12][16] = {
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1},
+        {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1},
+        {1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+        {1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
+        {1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+        {1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1}
+    };
+
+public:
+    void Draw(SDL_Renderer* renderer) {
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        for (int row = 0; row < 12; row++) {
+            for (int col = 0; col < 16; col++) {
+                if (maze[row][col] == 1) {
+                    SDL_Rect wallRect = { col * LINE_SIZE, row * LINE_SIZE, LINE_SIZE, LINE_SIZE };
+                    SDL_RenderFillRect(renderer, &wallRect);
+                }
+            }
+        }
+    }
+
+    bool CheckCollision(Entity* entity) {
+        SDL_Rect entityRect = { static_cast<int>(entity->GetPosition().x), static_cast<int>(entity->GetPosition().y), PLAYER_SIZE, PLAYER_SIZE };
+
+        for (int row = 0; row < 12; row++) {
+            for (int col = 0; col < 16; col++) {
+                if (maze[row][col] == 1) {
+                    SDL_Rect wallRect = { col * LINE_SIZE, row * LINE_SIZE, LINE_SIZE, LINE_SIZE };
+                    if (SDL_HasIntersection(&entityRect, &wallRect)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+};
+```
+## Vector2D.c
+```c
+#include "vector2d.h"
+#include <cmath>  // Para sqrt en el cálculo de magnitud
+
+// Constructor con parámetros
+Vector2D::Vector2D(float x, float y) : x(x), y(y) {}
+
+// Método para sumar otro vector a este
+void Vector2D::Add(const Vector2D& other) {
+    x += other.x;
+    y += other.y;
+}
+
+// Método para establecer nuevos valores en el vector
+void Vector2D::Set(float newX, float newY) {
+    x = newX;
+    y = newY;
+}
+
+// Método para calcular la magnitud del vector
+float Vector2D::Magnitude() const {
+    return sqrt(x * x + y * y);  // Raíz cuadrada de la suma de los cuadrados de x e y
+}
+
+// Método para normalizar el vector (convertirlo en un vector unitario)
+Vector2D Vector2D::Normalize() const {
+    float magnitude = Magnitude();
+    if (magnitude == 0) {
+        return Vector2D(0, 0);  // Evitar división por cero
+    }
+    return Vector2D(x / magnitude, y / magnitude);
+}
+```
+## Entity.h
+```c
+#ifndef ENTITY_H
+#define ENTITY_H
+
+#include "Vector2D.h"  // Usamos Vector2D para la posición
+
+class Entity {
+protected:
+    Vector2D position;  // Posición de la entidad
+    SDL_Texture* texture;
+
+public:
+    // Constructor
+    Entity(float x = 0, float y = 0);
+
+    // Métodos virtuales para que puedan ser sobreescritos en Player
+    virtual void Update() = 0;
+    virtual void Render(SDL_Renderer* renderer) = 0;
+
+    // Métodos de acceso
+    Vector2D GetPosition() const;
+    void SetPosition(float x, float y);
+};
+
+#endif // ENTITY_H
+
+```
+## Player.h
+```c
+#ifndef PLAYER_H
+#define PLAYER_H
+
+#include <SDL.h>
+#include "Entity.h"  // Incluimos la clase base Entity
+#include "Vector2D.h"  // Incluimos la clase Vector2D para manejar la posición
+
+#define PLAYER_SIZE 30
+#define PLAYER_SPEED 5
+
+class Player : public Entity {
+private:
+    int health;
+    int score;
+
+public:
+    // Constructor
+    Player(float x, float y);
+
+    // Métodos heredados de Entity que deben ser implementados
+    void Update() override;
+    void Render(SDL_Renderer* renderer) override;
+
+    // Métodos adicionales específicos del jugador
+    void HandleInput(const Uint8* state);
+
+    // Getters y setters para atributos adicionales
+    int GetHealth() const;
+    void SetHealth(int health);
+
+    int GetScore() const;
+    void SetScore(int score);
+};
+
+#endif // PLAYER_H
+```
+## Game.h
+```c
+#ifndef GAME_H
+#define GAME_H
+
+#include <SDL.h>
+#include "Player.h"  // Incluye la clase Player
+#include "Maze.h"    // Incluye la clase Maze
+
+class Game {
+private:
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+    bool gameIsRunning;
+    int lastUpdateTime;
+    Player* player;  // Agregación: Game "tiene un" Player
+    Maze maze;       // Agregación: Game "tiene un" Maze
+
+public:
+    Game();
+    ~Game();
+    void Setup();
+    void Update();
+    void Render();
+    void HandleEvents();
+    void Run();
+};
+
+#endif // GAME_H
+```
+## Vector2d.h
+```c
+#ifndef VECTOR2D_H
+#define VECTOR2D_H
+
+class Vector2D {
+public:
+    float x, y;
+
+    // Constructor por defecto y constructor con parámetros
+    Vector2D(float x = 0, float y = 0);
+
+    // Métodos para operar con el vector
+    void Add(const Vector2D& other);
+    void Set(float newX, float newY);
+
+    // Métodos adicionales útiles
+    float Magnitude() const;         // Devuelve la magnitud del vector
+    Vector2D Normalize() const;      // Normaliza el vector (lo convierte en un vector unitario)
+};
+
+#endif // VECTOR2D_H
+```
